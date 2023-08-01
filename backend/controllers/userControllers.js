@@ -1,15 +1,17 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 const generateToken = require("../config/generateToken");
+const protect=require("../../middleware/authMiddleware");
+
 
 const registerUser = asyncHandler(async (req, res) => {
+
   const { name, email, password, pic } = req.body;
   if (!name || !email || !password) {
     res.status(400);
     throw new Error("Please Enter All Fields");
   }
   const userExists = await User.findOne({ email });
-  // console.log(user)
   if (userExists) {
     res.status(400);
     throw new Error("User Already Exists");
@@ -25,8 +27,8 @@ const registerUser = asyncHandler(async (req, res) => {
   //   });
   try {
     await user.save();
-    console.log(user);
-    res.status(201).send(user);
+    const token= await generateToken(user)
+    res.status(201).send({user,token});
   } catch (e) {
     res.status(400);
     throw new Error("Faied To Create User");
@@ -37,7 +39,7 @@ const registerUser = asyncHandler(async (req, res) => {
   //       name: user.name,
   //       email: user.email,
   //       pic: user.pic,
-  //       token: generateToken(user._id),
+  //       
   //     });
   //   } else {
   //     res.status(400);
@@ -58,7 +60,9 @@ const authUser = asyncHandler(async (req, res) => {
     //   pic: user.pic,
     //   token: generateToken(user._id),
     // });
-    res.status(201).send(user);
+
+    const token=generateToken(user)
+    res.status(201).send({user,token});
   } else {
     res.status(401);
     throw new Error("Invalid Email Or Password");
@@ -74,6 +78,11 @@ const allUsers = asyncHandler(async (req, res) => {
         ],
       }
     : {};
+
+    const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
+    res.send(users);
   console.log(keyword);
 });
+
+
 module.exports = { registerUser, authUser, allUsers };

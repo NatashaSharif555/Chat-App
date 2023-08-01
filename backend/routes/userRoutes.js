@@ -5,8 +5,10 @@ const {
   authUser,
   allUsers,
 } = require("../controllers/userControllers");
+const { protect } = require("../../middleware/authMiddleware");
 
-router.route("/").post(registerUser)
+router.route("/").post(registerUser);
+
 router.route("/login").post(authUser);
 
 module.exports = router;
