@@ -6,5 +6,4 @@ const generateToken = async (user) => {
   return token;
 };
 
-const obj = {}
 module.exports = generateToken;
