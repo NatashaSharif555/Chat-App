@@ -5,4 +5,6 @@ const generateToken = async (user) => {
   await user.save();
   return token;
 };
+
+const obj = {}
 module.exports = generateToken;
